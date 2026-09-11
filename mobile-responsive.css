@@ -29,7 +29,8 @@
     display:flex;
     flex-direction:column;
     height:auto !important;
-    min-height:calc(100dvh - var(--hh) - 18px);
+    min-height:0 !important;
+    flex:0 0 auto !important;
     overflow:visible;
   }
 
@@ -129,10 +130,21 @@
 
   #log-section { padding-top:12px; }
 
+  /* Mobile footer: remains in normal document flow after the full app.
+     This prevents the creator legend from overlapping the footwear controls. */
   #creator-credit {
-    position:static;
-    width:100%;
-    height:18px;
+    position:static !important;
+    inset:auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:22px !important;
+    margin-top:0 !important;
+    margin-bottom:0 !important;
+    padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px)) !important;
+    flex:0 0 auto !important;
+    background:var(--bg) !important;
+    border:0 !important;
+    z-index:auto !important;
   }
 
   #modal-overlay { padding:10px; }
