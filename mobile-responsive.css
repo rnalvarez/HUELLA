@@ -1,0 +1,161 @@
+/* mobile-responsive.css — HUELLA
+ * Responsive presentation layer for phones and small tablets.
+ * Does not alter audio, event timing, recording or playback logic.
+ */
+
+@media (max-width: 700px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #app-header {
+    height:auto;
+    min-height:var(--hh);
+    padding:8px 10px;
+    align-items:center;
+  }
+
+  .header-left { min-width:0; }
+  .app-sub { display:none; }
+  .header-right { gap:6px; }
+  .header-right .btn { padding:6px 9px; }
+  .timecode { min-width:58px; font-size:10px; }
+
+  #app-main {
+    display:flex;
+    flex-direction:column;
+    height:auto !important;
+    min-height:calc(100dvh - var(--hh) - 18px);
+    overflow:visible;
+  }
+
+  #video-col {
+    width:100%;
+    flex:none;
+    padding:8px;
+    gap:6px;
+    overflow:visible;
+  }
+
+  #video-zone {
+    width:100%;
+    aspect-ratio:16 / 9;
+    min-height:180px;
+    flex:none;
+    border-radius:6px;
+  }
+
+  #timeline-panel {
+    width:100%;
+    flex:none;
+    padding:7px 8px 8px;
+    gap:5px;
+    border-radius:6px;
+  }
+
+  #timeline-toolbar {
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  .tl-hint {
+    width:100%;
+    margin-left:0;
+    white-space:normal;
+    line-height:1.25;
+    text-align:left;
+  }
+
+  #waveform-outer {
+    width:100%;
+    touch-action:pan-y;
+  }
+
+  #waveform {
+    width:100%;
+    height:112px !important;
+    touch-action:pan-y;
+  }
+
+  #tl-scroll-track { height:14px; }
+  #tl-scroll-thumb { height:12px; }
+
+  #controls-row {
+    width:100%;
+    gap:6px;
+  }
+
+  #controls-row .btn {
+    min-height:34px;
+    padding:7px 10px;
+    font-size:9px;
+  }
+
+  #controls-row .event-count {
+    width:100%;
+    margin-left:0;
+    text-align:right;
+  }
+
+  #hint-bar { line-height:1.3; }
+
+  #library-col {
+    width:100%;
+    flex:none;
+    border-left:0;
+    border-top:1px solid var(--border);
+    min-height:0;
+    background:var(--bg);
+  }
+
+  #library-header { padding:10px 12px; }
+
+  #library-scroll {
+    max-height:none;
+    height:auto;
+    overflow:visible;
+    padding:10px 12px 24px;
+    gap:14px;
+  }
+
+  .fw-btn { min-height:72px; padding:10px 6px; }
+  .surf-check { min-height:46px; }
+  .surf-fader { min-width:80px; }
+  .btn-trigger { min-height:52px; padding:13px 14px; }
+
+  #log-section { padding-top:12px; }
+
+  #creator-credit {
+    position:static;
+    width:100%;
+    height:18px;
+  }
+
+  #modal-overlay { padding:10px; }
+  #modal-box {
+    width:min(440px,100%);
+    max-height:88dvh;
+  }
+}
+
+@media (max-width:420px) {
+  #app-header { padding:7px 8px; }
+  .logo-box { width:28px; height:28px; }
+  .app-name { font-size:11px; }
+  .header-right .btn { font-size:8px; }
+  .timecode { min-width:54px; }
+
+  #video-col { padding:6px; }
+  #timeline-panel { padding:6px; }
+  #waveform { height:96px !important; }
+
+  .zoom-btn { width:32px; height:32px; }
+  .zoom-fit { width:38px; }
+
+  #controls-row .btn { flex:1 1 auto; }
+  #controls-row .export-status { width:100%; }
+}
