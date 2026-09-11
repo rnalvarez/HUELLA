@@ -2,11 +2,10 @@
  * Final runtime reliability layer.
  *
  * - Normalizes event layers against library.json before playback.
- * - Preloads every WAV needed by the current event set after timeline edits.
- * - Makes Space a reliable PLAY/STOP transport without requiring a prior click.
+ * - REPRODUCCIÓN starts the video immediately; WAV preload never blocks transport.
+ * - Button and Space use the same playback transport.
  * - During recording, Space remains the Foley trigger handled by final-fixes.js.
- * - Recording is incremental: starting a new recording pass preserves all
- *   previously recorded events in the same video/session.
+ * - Recording is incremental: starting a new recording pass preserves existing events.
  */
 'use strict';
 
@@ -37,13 +36,9 @@
   }
 
   // ── Incremental recording ─────────────────────────────────────────────
-  // app.js registers its own click listener before this file loads. A later
-  // reassignment of startRecording would not replace that already-registered
-  // callback, so capture the button click here and stop the old callback first.
   function startIncrementalRecording() {
     if (!S.videoLoaded || S.isRecording) return;
 
-    // Never carry a preview transport state into a new recording pass.
     if (S.isPreviewing && typeof window.stopPreview === 'function') {
       window.stopPreview();
     } else {
@@ -56,13 +51,12 @@
     S.startTimecode = video.currentTime;
     S.isRecording = true;
 
-    // IMPORTANT: preserve S.events and the existing session log.
     btnRecord.style.display = 'none';
     btnStop.style.display = 'inline-block';
     btnStop.disabled = false;
     playbackBtn.disabled = true;
     recIndicator?.classList.remove('hidden');
-    if (hintBar) hintBar.classList.remove('hidden');
+    hintBar?.classList.remove('hidden');
 
     if (typeof updateEventCount === 'function') updateEventCount();
     if (typeof updateHint === 'function') updateHint();
@@ -71,7 +65,7 @@
     if (typeof startRaf === 'function') startRaf();
 
     const p = video.play();
-    if (p && typeof p.catch === 'function') p.catch(err => console.warn('[record]', err));
+    if (p?.catch) p.catch(err => console.warn('[record]', err));
   }
 
   if (btnRecord) {
@@ -82,9 +76,6 @@
     }, true);
   }
 
-  // Build a real wrapper around the current implementation and intercept the
-  // existing button listener in capture phase, since app.js already registered
-  // its callback before this compatibility layer was loaded.
   let wrappedStopRecording = null;
   if (typeof stopRecording === 'function') {
     const originalStopRecording = stopRecording;
@@ -108,71 +99,115 @@
     }, true);
   }
 
-  // ── Preview preparation ────────────────────────────────────────────────
-  const originalStartPreview = window.startPreview;
-  const originalStopPreview = window.stopPreview;
-  let preparing = false;
+  // ── Unified playback transport ────────────────────────────────────────
+  let starting = false;
 
-  if (typeof originalStartPreview === 'function' && typeof originalStopPreview === 'function') {
-    window.startPreview = async function () {
-      if (preparing) return;
-      if (!S.videoLoaded || S.isRecording) return;
+  async function startPlayback() {
+    if (starting || S.isRecording || !S.videoLoaded) return;
+    if (S.isPreviewing) return;
 
-      normalizeEvents();
-      preparing = true;
-      playbackBtn.textContent = '… CARGANDO';
-      playbackBtn.disabled = true;
+    starting = true;
+    normalizeEvents();
+    S.isPreviewing = true;
+    S.previewTimers?.forEach(clearTimeout);
+    S.previewTimers = [];
 
-      try {
+    const startAt = video.currentTime;
+    S.startTimecode = startAt;
+    const ctx = AudioEngine.getCtx();
+
+    // Schedule Foley events from the current timecode. This does not await any
+    // WAV preload: AudioEngine can use its existing fallback while files load.
+    S.events
+      .filter(ev => ev.time >= startAt)
+      .forEach(ev => {
+        const delayMs = Math.max(0, (ev.time - startAt) * 1000);
+        S.previewTimers.push(setTimeout(() => {
+          if (!S.isPreviewing) return;
+          try {
+            AudioEngine.scheduleLayers(ev.layers || [], ctx.currentTime + 0.02);
+          } catch (err) {
+            console.warn('[preview] event scheduling failed', err);
+          }
+        }, delayMs));
+      });
+
+    try {
+      // The video transport is the primary action and starts immediately.
+      await video.play();
+      playbackBtn.textContent = '■ DETENER';
+      playbackBtn.disabled = false;
+      document.getElementById('play-indicator')?.classList.remove('hidden');
+      if (typeof startRaf === 'function') startRaf();
+
+      // Preload in background only. It must never gate playback.
+      if (typeof AudioEngine.preloadLayers === 'function') {
         const layers = S.events
-          .filter(ev => ev.time >= video.currentTime)
+          .filter(ev => ev.time >= startAt)
           .flatMap(ev => ev.layers || []);
-        if (typeof AudioEngine.preloadLayers === 'function') {
-          await AudioEngine.preloadLayers(layers);
-        }
-        if (!S.videoLoaded || S.isRecording) return;
-        await originalStartPreview();
-      } catch (err) {
-        console.warn('[runtime] No se pudo preparar la reproducción', err);
-        S.isPreviewing = false;
-        S.previewTimers?.forEach(clearTimeout);
-        S.previewTimers = [];
-        video.pause();
-        playbackBtn.textContent = '▶ REPRODUCCIÓN';
-      } finally {
-        preparing = false;
-        playbackBtn.disabled = !S.videoLoaded;
+        AudioEngine.preloadLayers(layers).catch(err =>
+          console.warn('[preview] background preload failed', err)
+        );
       }
-    };
-
-    window.stopPreview = function () {
-      preparing = false;
-      originalStopPreview();
+    } catch (err) {
+      console.warn('[preview] video.play() failed', err);
       S.isPreviewing = false;
       S.previewTimers?.forEach(clearTimeout);
       S.previewTimers = [];
+      playbackBtn.textContent = '▶ REPRODUCCIÓN';
+      document.getElementById('play-indicator')?.classList.add('hidden');
+    } finally {
+      starting = false;
       playbackBtn.disabled = !S.videoLoaded;
-      if (typeof drawWaveform === 'function') drawWaveform();
-    };
+    }
   }
 
-  // ── Space = playback transport ────────────────────────────────────────
+  function stopPlayback() {
+    starting = false;
+    S.isPreviewing = false;
+    S.previewTimers?.forEach(clearTimeout);
+    S.previewTimers = [];
+    video.pause();
+    playbackBtn.textContent = '▶ REPRODUCCIÓN';
+    playbackBtn.disabled = !S.videoLoaded;
+    document.getElementById('play-indicator')?.classList.add('hidden');
+    if (typeof drawWaveform === 'function') drawWaveform();
+  }
+
+  // Capture the button before app.js's original listener. This removes the
+  // previous dependency on legacy/local startPreview implementations.
+  playbackBtn.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (S.isPreviewing) stopPlayback();
+    else startPlayback();
+  }, true);
+
+  window.startPreview = startPlayback;
+  window.stopPreview = stopPlayback;
+
+  // Space is the same transport when not recording.
   window.addEventListener('keydown', event => {
     if (event.code !== 'Space' || event.repeat) return;
     const target = event.target;
     if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
-    if (S.isRecording) return;
-    if (!S.videoLoaded || typeof window.startPreview !== 'function') return;
+    if (S.isRecording || !S.videoLoaded) return;
 
     event.preventDefault();
     event.stopImmediatePropagation();
-
-    if (S.isPreviewing) {
-      if (typeof window.stopPreview === 'function') window.stopPreview();
-    } else {
-      window.startPreview();
-    }
+    if (S.isPreviewing) stopPlayback();
+    else startPlayback();
   }, true);
+
+  ['loadedmetadata', 'durationchange', 'canplay'].forEach(type => {
+    video.addEventListener(type, () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        S.videoLoaded = true;
+        if (!S.videoDuration) S.videoDuration = video.duration;
+        playbackBtn.disabled = false;
+      }
+    }, true);
+  });
 
   normalizeEvents();
 })();
