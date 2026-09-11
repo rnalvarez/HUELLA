@@ -75,7 +75,7 @@
   }
 
   async function triggerReliable() {
-    if (busy || !S.videoLoaded) return;
+    if (busy) return;
     const layers = canonicalize(layersFromCurrentSelection());
     if (!layers.length) return;
 
