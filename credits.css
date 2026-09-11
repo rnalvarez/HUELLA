@@ -1,8 +1,9 @@
-/* ── Creator credit ─────────────────────────────────────────────────────── */
+/* Creator credit / footer */
 #creator-credit{
-  position:static;
-  width:100%;
-  min-height:18px;
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
   height:18px;
   display:flex;
   align-items:center;
@@ -15,14 +16,13 @@
   font-size:8px;
   line-height:1;
   letter-spacing:.02em;
-  z-index:1;
+  z-index:50;
   pointer-events:none;
-  flex-shrink:0;
 }
 
 #app-main{height:calc(100vh - var(--hh) - 18px)}
 
-/* ── Modern Foley logo ──────────────────────────────────────────────────── */
+/* Modern Foley logo */
 .logo-box{
   width:30px;height:30px;background:var(--amber);border-radius:7px;
   display:flex;align-items:center;justify-content:center;
@@ -32,37 +32,42 @@
 .logo-mark{width:21px;height:21px;display:block}
 
 @media(max-width:700px){
-  html,
-  body{
+  html,body{
     height:auto!important;
-    min-height:100dvh;
+    min-height:100dvh!important;
   }
 
   body{
-    display:flex;
-    flex-direction:column;
+    display:flex!important;
+    flex-direction:column!important;
   }
 
   #app-main{
     height:auto!important;
     min-height:0!important;
+    flex:0 0 auto!important;
     padding-bottom:0!important;
-    flex:0 0 auto;
   }
 
+  /* On mobile the credit is a real document footer, never an overlay. */
   #creator-credit{
     position:static!important;
-    left:auto;
-    right:auto;
-    bottom:auto;
-    width:100%;
-    height:auto;
-    min-height:24px;
-    margin:0;
-    padding:5px 10px calc(5px + env(safe-area-inset-bottom, 0px));
-    flex:0 0 auto;
-    font-size:7px;
-    line-height:1.25;
-    border-top:1px solid rgba(42,42,46,.65);
+    inset:auto!important;
+    top:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    left:auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:24px!important;
+    margin:0!important;
+    padding:5px 10px calc(5px + env(safe-area-inset-bottom, 0px))!important;
+    flex:0 0 auto!important;
+    order:3!important;
+    z-index:auto!important;
+    background:var(--bg)!important;
+    border-top:1px solid rgba(42,42,46,.65)!important;
+    font-size:7px!important;
+    line-height:1.25!important;
   }
 }
