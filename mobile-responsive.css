@@ -12,11 +12,20 @@
     overflow-y: auto;
   }
 
+  /* Mobile uses one continuous vertical document flow. This makes the
+     creator credit a true page footer instead of allowing it to visually
+     track an internal library section. */
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
   #app-header {
     height:auto;
     min-height:var(--hh);
     padding:8px 10px;
     align-items:center;
+    flex:0 0 auto;
   }
 
   .header-left { min-width:0; }
@@ -130,21 +139,22 @@
 
   #log-section { padding-top:12px; }
 
-  /* Mobile footer: remains in normal document flow after the full app.
-     This prevents the creator legend from overlapping the footwear controls. */
+  /* Mobile footer: always follows the complete #app-main in normal flow. */
   #creator-credit {
-    position:static !important;
+    position:relative !important;
     inset:auto !important;
+    display:block !important;
+    clear:both !important;
     width:100% !important;
     height:auto !important;
     min-height:22px !important;
-    margin-top:0 !important;
-    margin-bottom:0 !important;
+    margin:0 !important;
     padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px)) !important;
     flex:0 0 auto !important;
     background:var(--bg) !important;
     border:0 !important;
     z-index:auto !important;
+    text-align:center !important;
   }
 
   #modal-overlay { padding:10px; }
