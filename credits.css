@@ -1,9 +1,8 @@
 /* ── Creator credit ─────────────────────────────────────────────────────── */
 #creator-credit{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
+  position:static;
+  width:100%;
+  min-height:18px;
   height:18px;
   display:flex;
   align-items:center;
@@ -16,8 +15,9 @@
   font-size:8px;
   line-height:1;
   letter-spacing:.02em;
-  z-index:50;
+  z-index:1;
   pointer-events:none;
+  flex-shrink:0;
 }
 
 #app-main{height:calc(100vh - var(--hh) - 18px)}
@@ -32,8 +32,6 @@
 .logo-mark{width:21px;height:21px;display:block}
 
 @media(max-width:700px){
-  /* En móvil el crédito forma parte del documento: queda realmente
-     después de todo el contenido, en el pie, y no superpuesto a la UI. */
   html,
   body{
     height:auto!important;
@@ -48,20 +46,20 @@
   #app-main{
     height:auto!important;
     min-height:0!important;
-    padding-bottom:0;
+    padding-bottom:0!important;
     flex:0 0 auto;
   }
 
   #creator-credit{
-    position:static;
+    position:static!important;
     left:auto;
     right:auto;
     bottom:auto;
     width:100%;
     height:auto;
-    min-height:18px;
+    min-height:24px;
+    margin:0;
     padding:5px 10px calc(5px + env(safe-area-inset-bottom, 0px));
-    margin-top:0;
     flex:0 0 auto;
     font-size:7px;
     line-height:1.25;
