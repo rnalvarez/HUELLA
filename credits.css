@@ -7,7 +7,7 @@
   min-height:18px;
   box-sizing:border-box;
   padding:0 10px;
-  margin-top:auto;
+  margin:0;
   background:var(--bg);
   color:var(--dark);
   font-family:var(--mono);
@@ -29,8 +29,6 @@
 .logo-mark{width:21px;height:21px;display:block}
 
 @media(max-width:700px){
-  /* Mobile: the creator credit is a normal block after the complete app.
-     It must never consume an auto margin or overlap the library controls. */
   html,body{
     height:auto!important;
     min-height:100dvh!important;
@@ -46,13 +44,24 @@
     min-height:0!important;
     flex:0 0 auto!important;
     padding-bottom:0!important;
+    overflow:visible!important;
   }
 
   #creator-credit{
-    position:static!important;
+    position:relative!important;
+    top:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    left:auto!important;
     inset:auto!important;
+    float:none!important;
+    clear:both!important;
+    transform:none!important;
     display:flex!important;
+    order:9999!important;
+    align-self:stretch!important;
     width:100%!important;
+    height:auto!important;
     min-height:22px!important;
     margin:0!important;
     padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px))!important;
@@ -62,5 +71,6 @@
     font-size:7px!important;
     line-height:1.25!important;
     flex:0 0 auto!important;
+    text-align:center!important;
   }
 }
