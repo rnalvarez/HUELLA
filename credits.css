@@ -29,9 +29,8 @@
 .logo-mark{width:21px;height:21px;display:block}
 
 @media(max-width:700px){
-  /* The footer stays in normal document flow.
-     When content is shorter than the viewport it is pushed to the bottom;
-     when content is taller, it follows the tool and never covers it. */
+  /* Mobile: the creator credit is a normal block after the complete app.
+     It must never consume an auto margin or overlap the library controls. */
   html,body{
     height:auto!important;
     min-height:100dvh!important;
@@ -52,10 +51,10 @@
   #creator-credit{
     position:static!important;
     inset:auto!important;
+    display:flex!important;
     width:100%!important;
     min-height:22px!important;
-    margin-top:auto!important;
-    margin-bottom:0!important;
+    margin:0!important;
     padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px))!important;
     background:var(--bg)!important;
     border:0!important;
