@@ -12,9 +12,6 @@
     overflow-y: auto;
   }
 
-  /* Mobile uses one continuous vertical document flow. This makes the
-     creator credit a true page footer instead of allowing it to visually
-     track an internal library section. */
   body {
     display: flex;
     flex-direction: column;
@@ -40,7 +37,8 @@
     height:auto !important;
     min-height:0 !important;
     flex:0 0 auto !important;
-    overflow:visible;
+    overflow:visible !important;
+    position:relative !important;
   }
 
   #video-col {
@@ -139,12 +137,20 @@
 
   #log-section { padding-top:12px; }
 
-  /* Mobile footer: always follows the complete #app-main in normal flow. */
+  /* Mobile footer: never float over the library; it is the final flex item. */
   #creator-credit {
     position:relative !important;
+    top:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    left:auto !important;
     inset:auto !important;
-    display:block !important;
+    float:none !important;
     clear:both !important;
+    transform:none !important;
+    display:flex !important;
+    order:9999 !important;
+    align-self:stretch !important;
     width:100% !important;
     height:auto !important;
     min-height:22px !important;
