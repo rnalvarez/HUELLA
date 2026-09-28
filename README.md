@@ -214,3 +214,18 @@ En GitHub:
 ## Autoría
 
 **Diseñado y creado por Ramiro N. Alvarez · con herramientas de IA.**
+
+## Licencia y autoría
+
+El software y la documentación de HUELLA se distribuyen bajo la **Apache License 2.0 (Apache-2.0)**. El texto completo de la licencia está en [LICENSE](LICENSE).
+
+**Copyright © 2026 Ramiro N. Alvarez.**
+
+HUELLA fue diseñado y desarrollado por Ramiro N. Alvarez con asistencia de herramientas de inteligencia artificial.
+
+La licencia permite usar, copiar, modificar y redistribuir el software conforme a sus términos, incluyendo la conservación de los avisos de copyright y atribución correspondientes.
+
+### Archivos de audio
+
+El directorio `samples/` contiene archivos de audio. Esos archivos no deben considerarse automáticamente cubiertos por la Apache License 2.0 del software. Al reutilizarlos o redistribuirlos, deben respetarse los derechos y condiciones de distribución que correspondan a cada sample.
+
